@@ -109,6 +109,7 @@ class Renault extends utils.Adapter {
                 format: "json",
                 login_token: this.session_data.cookieValue,
                 sdk: "js_latest",
+                fields: "data.personId,data.gigyaDataCenter",
                 apikey: this.apiKey,
                 expiration: "3600",
             }),
@@ -135,7 +136,6 @@ class Renault extends utils.Adapter {
                 "Accept-Language": "de-de",
                 "x-gigya-id_token": this.session.id_token,
             },
-            data: "https://apis.renault.com/myr/api/v1/connection?&country=DE&product=MYRENAULT&locale=de-DE&displayAccounts=MYRENAULT",
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
