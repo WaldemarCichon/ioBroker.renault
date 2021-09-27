@@ -305,7 +305,10 @@ class Renault extends utils.Adapter {
                         if (!res.data) {
                             return;
                         }
-                        const data = res.data.data.attributes;
+                        let data = res.data;
+                        if (res.data.data && res.data.data.attributes) {
+                            data = res.data.data.attributes;
+                        }
 
                         const forceIndex = null;
                         const preferedArrayName = null;
@@ -350,6 +353,7 @@ class Renault extends utils.Adapter {
                 format: "json",
                 login_token: this.session_data.cookieValue,
                 sdk: "js_latest",
+                fields: "data.personId,data.gigyaDataCenter",
                 apikey: this.apiKey,
                 expiration: "3600",
             }),
