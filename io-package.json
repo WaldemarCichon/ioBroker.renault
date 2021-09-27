@@ -30,16 +30,16 @@
             "zh-cn": "雷诺和佐伊"
         },
         "desc": {
-            "en": "Adapter for Renault",
-            "de": "Adapter für Renault",
-            "ru": "Адаптер для Renault",
-            "pt": "Adaptador para Renault",
-            "nl": "Adapter voor Renault",
-            "fr": "Adaptateur pour Renault",
-            "it": "Adattatore per Renault",
-            "es": "Adaptador para Renault",
-            "pl": "Adapter do Renault",
-            "zh-cn": "雷诺和佐伊的适配器"
+            "en": "Adapter for Renault cars for example Zoe",
+            "de": "Adapter für Renault Autos zum Beispiel Zoe",
+            "ru": "Адаптер для автомобилей Renault на примере Zoe",
+            "pt": "Adaptador para carros Renault, por exemplo Zoe",
+            "nl": "Adapter voor Renault auto's bijvoorbeeld Zoe",
+            "fr": "Adaptateur pour voitures Renault par exemple Zoe",
+            "it": "Adattatore per auto Renault ad esempio Zoe",
+            "es": "Adaptador para automóviles Renault, por ejemplo Zoe",
+            "pl": "Adapter do samochodów Renault np. Zoe",
+            "zh-cn": "雷诺汽车的适配器，例如 Zoe"
         },
         "authors": [
             "TA2k <tombox2020@gmail.com>"
