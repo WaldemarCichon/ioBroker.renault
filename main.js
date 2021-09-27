@@ -263,7 +263,7 @@ class Renault extends utils.Adapter {
             },
             {
                 path: "lock-status",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charging-history?type=month",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charging-history?type=month&country=de",
                 desc: "Lock status of the car",
             },
             {
@@ -321,7 +321,7 @@ class Renault extends utils.Adapter {
 
                             return;
                         }
-                        if (error.response && error.response.status === 404) {
+                        if (error.response && (error.response.status === 404 || error.response.status === 500)) {
                             this.ignoreState.push(element.path);
                             this.log.info("Ignore " + element.path);
                         }
