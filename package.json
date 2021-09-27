@@ -11,7 +11,7 @@
       "name": "fungus75"
     }
   ],
-  "homepage": "https://github.com/iobroker-community-adapters/ioBroker.renault",
+  "homepage": "https://github.com/TA2k/ioBroker.renault",
   "license": "MIT",
   "keywords": [
     "renault",
@@ -19,7 +19,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/iobroker-community-adapters/ioBroker.renault"
+    "url": "https://github.com/TA2k/ioBroker.renault"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^2.5.1",
@@ -67,7 +67,7 @@
     "lint": "eslint"
   },
   "bugs": {
-    "url": "https://github.com/iobroker-community-adapters/ioBroker.renault/issues"
+    "url": "https://github.com/TA2k/ioBroker.renault/issues"
   },
   "readmeFilename": "README.md"
 }

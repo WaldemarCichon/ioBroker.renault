@@ -5,11 +5,11 @@
 [![Downloads](https://img.shields.io/npm/dm/iobroker.renault.svg)](https://www.npmjs.com/package/iobroker.renault)
 ![Number of Installations](https://iobroker.live/badges/renault-installed.svg)
 ![Current version in stable repository](https://iobroker.live/badges/renault-stable.svg)
-[![Dependency Status](https://img.shields.io/david/iobroker-community-adapters/iobroker.renault.svg)](https://david-dm.org/iobroker-community-adapters/iobroker.renault)
+[![Dependency Status](https://img.shields.io/david/TA2k/iobroker.renault.svg)](https://david-dm.org/TA2k/iobroker.renault)
 
 [![NPM](https://nodei.co/npm/iobroker.renault.png?downloads=true)](https://nodei.co/npm/iobroker.renault/)
 
-**Tests:** ![Test and Release](https://github.com/iobroker-community-adapters/ioBroker.renault/workflows/Test%20and%20Release/badge.svg)
+**Tests:** ![Test and Release](https://github.com/TA2k/ioBroker.renault/workflows/Test%20and%20Release/badge.svg)
 
 ## renault adapter for ioBroker
 
