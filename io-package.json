@@ -1,0 +1,111 @@
+{
+    "common": {
+        "name": "renault",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "Renault",
+        "titleLang": {
+            "en": "Renault",
+            "de": "Renault",
+            "ru": "Рено",
+            "pt": "Renault",
+            "nl": "Renault",
+            "fr": "Renault",
+            "it": "Renault",
+            "es": "Renault",
+            "pl": "Renault ",
+            "zh-cn": "雷诺和佐伊"
+        },
+        "desc": {
+            "en": "Adapter for Renault",
+            "de": "Adapter für Renault",
+            "ru": "Адаптер для Renault",
+            "pt": "Adaptador para Renault",
+            "nl": "Adapter voor Renault",
+            "fr": "Adaptateur pour Renault",
+            "it": "Adattatore per Renault",
+            "es": "Adaptador para Renault",
+            "pl": "Adapter do Renault",
+            "zh-cn": "雷诺和佐伊的适配器"
+        },
+        "authors": [
+            "TA2k <tombox2020@gmail.com>"
+        ],
+        "keywords": [
+            "renault",
+            "Renault"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "main.js",
+        "icon": "renault.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.renault/master/admin/renault.png",
+        "readme": "https://github.com/iobroker-community-adapters/ioBroker.renault/blob/master/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "vehicle",
+        "compact": true,
+        "connectionType": "cloud",
+        "dataSource": "poll",
+        "materialize": true,
+        "dependencies": [
+            {
+                "js-controller": ">=3.0.0"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=4.0.9"
+            }
+        ]
+    },
+    "encryptedNative": [
+        "password"
+    ],
+    "protectedNative": [
+        "password"
+    ],
+    "native": {
+        "username": "",
+        "password": "",
+        "interval": 10
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}
