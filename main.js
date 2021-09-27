@@ -93,6 +93,7 @@ class Renault extends utils.Adapter {
                 }
             });
         if (!this.session_data) {
+            this.log.error("No session found for this account");
             return;
         }
         await this.requestClient({
@@ -163,6 +164,7 @@ class Renault extends utils.Adapter {
         })
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
+
                 for (const device of res.data.vehicleLinks) {
                     this.deviceArray.push(device.vin);
                     await this.setObjectNotExistsAsync(device.vin, {
