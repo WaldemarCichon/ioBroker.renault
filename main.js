@@ -327,7 +327,7 @@ class Renault extends utils.Adapter {
 
                                 return;
                             }
-                            if (error.response.status === 404 || error.response.status === 500) {
+                            if (error.response.status === 404 || error.response.status === 502 || error.response.status === 400) {
                                 this.ignoreState.push(element.path);
                                 this.log.info("Ignore " + element.path);
                             }
