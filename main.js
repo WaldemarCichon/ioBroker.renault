@@ -190,9 +190,11 @@ class Renault extends utils.Adapter {
                     });
 
                     const remoteArray = [
-                        { command: "hvac-start", name: "True = Start, False = Stop" },
+                        { command: "actions/hvac-start", name: "True = Start, False = Stop" },
                         { command: "hvac-temperature", name: "HVAC Temperature", type: "number", role: "value" },
-                        { command: "charging-start", name: "True = Start, False = Stop" },
+                        { command: "actions/charging-start", name: "True = Start, False = Stop" },
+                        { command: "charge/pause-resume", name: "True = Start, False = Stop" },
+                        { command: "charge/start", name: "True = Start, False = Stop" },
                     ];
                     remoteArray.forEach((remote) => {
                         this.setObjectNotExists(device.vin + ".remote." + remote.command, {
@@ -217,6 +219,8 @@ class Renault extends utils.Adapter {
     }
 
     async updateDevices() {
+        const curDate = new Date().toISOString().split("T")[0];
+
         const statusArray = [
             {
                 path: "battery-status",
@@ -254,18 +258,28 @@ class Renault extends utils.Adapter {
                 desc: "Charging settings of the car",
             },
             {
-                path: "charging-history",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charging-settings?country=de",
+                path: "charge-history",
+                url:
+                    "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+                    this.account.accountId +
+                    "/kamereon/kca/car-adapter/v1/cars/$vin/charge-history?type=day&start=1970-01-01&end=" +
+                    curDate +
+                    "&country=de",
                 desc: "Charging history of the car",
             },
             {
                 path: "charges",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charges?country=de",
+                url:
+                    "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+                    this.account.accountId +
+                    "/kamereon/kca/car-adapter/v1/cars/$vin/charges?start=1970-01-01&end=" +
+                    curDate +
+                    "&country=de",
                 desc: "Charges of the car",
             },
             {
                 path: "lock-status",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charging-history?type=month&country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/lock-status?country=de",
                 desc: "Lock status of the car",
             },
             {
@@ -327,9 +341,11 @@ class Renault extends utils.Adapter {
 
                                 return;
                             }
-                            if (error.response.status === 404 || error.response.status === 502 || error.response.status === 400) {
+                            if (error.response.status === 404 || error.response.status === 500 || error.response.status === 501 || error.response.status === 502 || error.response.status === 400) {
                                 this.ignoreState.push(element.path);
-                                this.log.info("Ignore " + element.path);
+                                this.log.info("Feature not found. Ignore " + element.path + " for updates.");
+                                this.log.info(error);
+                                error.response && this.log.info(JSON.stringify(error.response.data));
                             }
                         }
                         this.log.error(url);
@@ -413,21 +429,14 @@ class Renault extends utils.Adapter {
                 const command = id.split(".")[4];
                 const data = { data: { type: this.toCamelCase(command), attributes: { action: state.val ? "start" : "cancel" } } };
                 if (command === "hvac-start") {
-                    const temperatureState = await this.getStateAsync(deviceId + ".remote.temperature");
-                    data.data.attributes.targetTemperature = temperatureState ? temperatureState.val : "21";
+                    const temperatureState = await this.getStateAsync(deviceId + ".remote.hvac-temperature");
+                    data.data.attributes.targetTemperature = temperatureState.val ? temperatureState.val : "21";
                 }
 
                 this.log.debug(JSON.stringify(data));
                 await this.requestClient({
                     method: "post",
-                    url:
-                        "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
-                        this.account.accountId +
-                        "/kamereon/kca/car-adapter/v2/cars/" +
-                        deviceId +
-                        "/actions/" +
-                        command +
-                        "?country=de",
+                    url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/" + deviceId + "/" + command + "?country=de",
                     headers: {
                         apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
                         "content-type": "application/json",
