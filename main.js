@@ -316,21 +316,22 @@ class Renault extends utils.Adapter {
                         this.json2iob.parse(vin + "." + element.path, data, { forceIndex: forceIndex, preferedArrayName: preferedArrayName, channelName: element.desc });
                     })
                     .catch((error) => {
-                        if (error.response && error.response.status === 401) {
-                            error.response && this.log.debug(JSON.stringify(error.response.data));
-                            this.log.info(element.path + " receive 401 error. Refresh Token in 60 seconds");
-                            clearTimeout(this.refreshTokenTimeout);
-                            this.refreshTokenTimeout = setTimeout(() => {
-                                this.refreshToken();
-                            }, 1000 * 60);
+                        if (error.response) {
+                            if (error.response.status === 401) {
+                                error.response && this.log.debug(JSON.stringify(error.response.data));
+                                this.log.info(element.path + " receive 401 error. Refresh Token in 60 seconds");
+                                clearTimeout(this.refreshTokenTimeout);
+                                this.refreshTokenTimeout = setTimeout(() => {
+                                    this.refreshToken();
+                                }, 1000 * 60);
 
-                            return;
+                                return;
+                            }
+                            if (error.response.status === 404 || error.response.status === 500) {
+                                this.ignoreState.push(element.path);
+                                this.log.info("Ignore " + element.path);
+                            }
                         }
-                        if (error.response && (error.response.status === 404 || error.response.status === 500)) {
-                            this.ignoreState.push(element.path);
-                            this.log.info("Ignore " + element.path);
-                        }
-
                         this.log.error(url);
                         this.log.error(error);
                         error.response && this.log.error(JSON.stringify(error.response.data));
