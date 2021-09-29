@@ -170,7 +170,7 @@ class Renault extends utils.Adapter {
                     await this.setObjectNotExistsAsync(device.vin, {
                         type: "device",
                         common: {
-                            name: device.vehicleDetails.registrationNumber,
+                            name: device.vehicleDetails.modelSCR,
                         },
                         native: {},
                     });
@@ -346,6 +346,7 @@ class Renault extends utils.Adapter {
                                 this.log.info("Feature not found. Ignore " + element.path + " for updates.");
                                 this.log.info(error);
                                 error.response && this.log.info(JSON.stringify(error.response.data));
+                                return;
                             }
                         }
                         this.log.error(url);
@@ -426,17 +427,20 @@ class Renault extends utils.Adapter {
         if (state) {
             if (!state.ack) {
                 const deviceId = id.split(".")[2];
-                const command = id.split(".")[4];
+                const path = id.split(".")[4];
+                const command = path.split("/")[1];
                 const data = { data: { type: this.toCamelCase(command), attributes: { action: state.val ? "start" : "cancel" } } };
                 if (command === "hvac-start") {
                     const temperatureState = await this.getStateAsync(deviceId + ".remote.hvac-temperature");
-                    data.data.attributes.targetTemperature = temperatureState.val ? temperatureState.val : "21";
+                    if (temperatureState) {
+                        data.data.attributes.targetTemperature = temperatureState.val ? temperatureState.val : "21";
+                    }
                 }
 
                 this.log.debug(JSON.stringify(data));
                 await this.requestClient({
                     method: "post",
-                    url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/" + deviceId + "/" + command + "?country=de",
+                    url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/" + deviceId + "/" + path + "?country=de",
                     headers: {
                         apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
                         "content-type": "application/json",
