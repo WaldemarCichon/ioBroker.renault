@@ -140,7 +140,11 @@ class Renault extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
-                this.account = res.data.currentUser.accounts[0];
+                const filteredAccounts = res.data.currentUser.accounts.filter(function (el) {
+                    return (el.accountType = "MYRENAULT");
+                });
+
+                this.account = filteredAccounts[0];
             })
             .catch((error) => {
                 this.log.error(error);
