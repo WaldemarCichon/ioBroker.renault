@@ -141,7 +141,7 @@ class Renault extends utils.Adapter {
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
                 const filteredAccounts = res.data.currentUser.accounts.filter(function (el) {
-                    return (el.accountType = "MYRENAULT");
+                    return (el.accountType = "MYRENAULT" && el.accountStatus === "ACTIVE");
                 });
 
                 this.account = filteredAccounts[0];
