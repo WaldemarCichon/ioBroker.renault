@@ -242,6 +242,11 @@ class Renault extends utils.Adapter {
                 desc: "Status of the car",
             },
             {
+                path: "cockpitv2",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/$vin/cockpit?country=de",
+                desc: "Statusv2 of the car",
+            },
+            {
                 path: "charge-mode",
                 url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charge-mode?country=de",
                 desc: "Charge mode of the car",
