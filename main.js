@@ -24,6 +24,9 @@ class Renault extends utils.Adapter {
         this.on("ready", this.onReady.bind(this));
         this.on("stateChange", this.onStateChange.bind(this));
         this.on("unload", this.onUnload.bind(this));
+        this.deviceArray = [];
+        this.json2iob = new Json2iob(this);
+        this.ignoreState = [];
     }
 
     /**
@@ -40,10 +43,8 @@ class Renault extends utils.Adapter {
         this.updateInterval = null;
         this.reLoginTimeout = null;
         this.refreshTokenTimeout = null;
-        this.json2iob = new Json2iob(this);
-        this.deviceArray = [];
+        this.country = this.config.country || "de";
         this.session = {};
-        this.ignoreState = [];
         //DE API Key
         this.apiKey = "3_7PLksOyBRkHv126x5WhHb-5pqC1qFR8pQjxSeLB6nhAnPERTUlwnYoznHSxwX668";
         this.subscribeStates("*");
@@ -141,7 +142,7 @@ class Renault extends utils.Adapter {
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
                 const filteredAccounts = res.data.currentUser.accounts.filter(function (el) {
-                    return (el.accountType === "MYRENAULT" && el.accountStatus === "ACTIVE");
+                    return el.accountType === "MYRENAULT" && el.accountStatus === "ACTIVE";
                 });
 
                 this.account = filteredAccounts[0];
@@ -156,7 +157,7 @@ class Renault extends utils.Adapter {
     async getDeviceList() {
         await this.requestClient({
             method: "get",
-            url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/vehicles?country=de&oms=false",
+            url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/vehicles?country=" + this.country + "&oms=false",
             headers: {
                 apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
                 "content-type": "application/json",
@@ -228,42 +229,46 @@ class Renault extends utils.Adapter {
         const statusArray = [
             {
                 path: "battery-status",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/$vin/battery-status?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/$vin/battery-status?country=" + this.country,
                 desc: "Battery status of the car",
             },
             {
                 path: "battery-inhibition-status",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/battery-inhibition-status?country=de",
+                url:
+                    "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+                    this.account.accountId +
+                    "/kamereon/kca/car-adapter/v1/cars/$vin/battery-inhibition-status?country=" +
+                    this.country,
                 desc: "Battery inhibition status of the car",
             },
             {
                 path: "cockpit",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/cockpit?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/cockpit?country=" + this.country,
                 desc: "Status of the car",
             },
             {
                 path: "cockpitv2",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/$vin/cockpit?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/$vin/cockpit?country=" + this.country,
                 desc: "Statusv2 of the car",
             },
             {
                 path: "charge-mode",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charge-mode?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charge-mode?country=" + this.country,
                 desc: "Charge mode of the car",
             },
             {
                 path: "hvac-status",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/hvac-status?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/hvac-status?country=" + this.country,
                 desc: "HVAC status of the car",
             },
             {
                 path: "hvac-settings",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/hvac-settings?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/hvac-settings?country=" + this.country,
                 desc: "HVAC settings of the car",
             },
             {
                 path: "charging-settings",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charging-settings?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/charging-settings?country=" + this.country,
                 desc: "Charging settings of the car",
             },
             {
@@ -273,7 +278,8 @@ class Renault extends utils.Adapter {
                     this.account.accountId +
                     "/kamereon/kca/car-adapter/v1/cars/$vin/charge-history?type=day&start=1970-01-01&end=" +
                     curDate +
-                    "&country=de",
+                    "&country=" +
+                    this.country,
                 desc: "Charging history of the car",
             },
             {
@@ -283,22 +289,23 @@ class Renault extends utils.Adapter {
                     this.account.accountId +
                     "/kamereon/kca/car-adapter/v1/cars/$vin/charges?start=1970-01-01&end=" +
                     curDate +
-                    "&country=de",
+                    "&country=" +
+                    this.country,
                 desc: "Charges of the car",
             },
             {
                 path: "lock-status",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/lock-status?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/lock-status?country=" + this.country,
                 desc: "Lock status of the car",
             },
             {
                 path: "res-state",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/res-state?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/res-state?country=" + this.country,
                 desc: "Res status of the car",
             },
             {
                 path: "location",
-                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/location?country=de",
+                url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v1/cars/$vin/location?country=" + this.country,
                 desc: "Location of the car",
             },
         ];
@@ -350,7 +357,14 @@ class Renault extends utils.Adapter {
 
                                 return;
                             }
-                            if (error.response.status === 404 || error.response.status === 500 || error.response.status === 501 || error.response.status === 502 || error.response.status === 400) {
+                            if (
+                                error.response.status === 403 ||
+                                error.response.status === 404 ||
+                                error.response.status === 500 ||
+                                error.response.status === 501 ||
+                                error.response.status === 502 ||
+                                error.response.status === 400
+                            ) {
                                 this.ignoreState.push(element.path);
                                 this.log.info("Feature not found. Ignore " + element.path + " for updates.");
                                 this.log.info(error);
@@ -449,7 +463,15 @@ class Renault extends utils.Adapter {
                 this.log.debug(JSON.stringify(data));
                 await this.requestClient({
                     method: "post",
-                    url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/kamereon/kca/car-adapter/v2/cars/" + deviceId + "/" + path + "?country=de",
+                    url:
+                        "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+                        this.account.accountId +
+                        "/kamereon/kca/car-adapter/v2/cars/" +
+                        deviceId +
+                        "/" +
+                        path +
+                        "?country=" +
+                        this.country,
                     headers: {
                         apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
                         "content-type": "application/json",

@@ -50,4 +50,16 @@ systemDictionary = {
         pl: "Interwał aktualizacji (w minutach)",
         "zh-cn": "更新间隔（分钟）",
     },
+    Country: {
+        en: "Country",
+        de: "Land",
+        ru: "Страна",
+        pt: "País",
+        nl: "Land",
+        fr: "Pays",
+        it: "Nazione",
+        es: "País",
+        pl: "Kraj",
+        "zh-cn": "国家",
+    },
 };

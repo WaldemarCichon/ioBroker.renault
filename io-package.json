@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "renault",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "news": {
-            "0.0.2": {
+            "0.0.3": {
                 "en": "initial release",
                 "de": "Erstveröffentlichung",
                 "ru": "Начальная версия",
@@ -86,6 +86,7 @@
     ],
     "native": {
         "username": "",
+        "country": "de",
         "password": "",
         "interval": 10
     },
