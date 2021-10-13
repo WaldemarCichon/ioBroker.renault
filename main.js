@@ -455,6 +455,9 @@ class Renault extends utils.Adapter {
             if (!state.ack) {
                 const deviceId = id.split(".")[2];
                 const path = id.split(".")[4];
+                if (path === "hvac-temperature") {
+                    return;
+                }
                 const command = path.split("/")[1];
                 const data = { data: { type: this.toCamelCase(command), attributes: { action: state.val ? "start" : "cancel" } } };
                 if (command === "hvac-start") {
