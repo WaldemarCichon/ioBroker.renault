@@ -481,13 +481,13 @@ class Renault extends utils.Adapter {
                     url: url,
                     headers: {
                         apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
-                        "content-type": "application/json",
+                        "content-type": "application/vnd.api+json",
                         accept: "*/*",
                         "user-agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
                         "accept-language": "de-de",
                         "x-gigya-id_token": this.session.id_token,
                     },
-                    data: JSON.stringify(data),
+                    data: data,
                 })
                     .then((res) => {
                         this.log.debug(JSON.stringify(res.data));

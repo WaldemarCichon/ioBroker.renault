@@ -29,7 +29,7 @@ renault.0.vin.remote auf true setzen steuert den jeweiligen Befehl
 
 ## Changelog
 
-### 0.0.3
+### 0.0.4
 
 * (TA2k) initial release
 
