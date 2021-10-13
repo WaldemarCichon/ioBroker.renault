@@ -172,10 +172,14 @@ class Renault extends utils.Adapter {
 
                 for (const device of res.data.vehicleLinks) {
                     this.deviceArray.push(device.vin);
+                    let name = device.vehicleDetails.modelSCR;
+                    if (device.vehicleDetails.model && device.vehicleDetails.model.label) {
+                        name += device.vehicleDetails.model.label;
+                    }
                     await this.setObjectNotExistsAsync(device.vin, {
                         type: "device",
                         common: {
-                            name: device.vehicleDetails.modelSCR,
+                            name: name,
                         },
                         native: {},
                     });
@@ -456,7 +460,9 @@ class Renault extends utils.Adapter {
                 if (command === "hvac-start") {
                     const temperatureState = await this.getStateAsync(deviceId + ".remote.hvac-temperature");
                     if (temperatureState) {
-                        data.data.attributes.targetTemperature = temperatureState.val ? temperatureState.val : "21";
+                        data.data.attributes.targetTemperature = temperatureState.val ? temperatureState.val : 21;
+                    } else {
+                        data.data.attributes.targetTemperature = 21;
                     }
                 }
                 const url =
@@ -481,7 +487,7 @@ class Renault extends utils.Adapter {
                         "accept-language": "de-de",
                         "x-gigya-id_token": this.session.id_token,
                     },
-                    data: data,
+                    data: JSON.stringify(data),
                 })
                     .then((res) => {
                         this.log.debug(JSON.stringify(res.data));
