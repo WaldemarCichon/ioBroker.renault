@@ -459,19 +459,20 @@ class Renault extends utils.Adapter {
                         data.data.attributes.targetTemperature = temperatureState.val ? temperatureState.val : "21";
                     }
                 }
-
+                const url =
+                    "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+                    this.account.accountId +
+                    "/kamereon/kca/car-adapter/v2/cars/" +
+                    deviceId +
+                    "/" +
+                    path +
+                    "?country=" +
+                    this.country;
                 this.log.debug(JSON.stringify(data));
+                this.log.debug(url);
                 await this.requestClient({
                     method: "post",
-                    url:
-                        "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
-                        this.account.accountId +
-                        "/kamereon/kca/car-adapter/v2/cars/" +
-                        deviceId +
-                        "/" +
-                        path +
-                        "?country=" +
-                        this.country,
+                    url: url,
                     headers: {
                         apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
                         "content-type": "application/json",
