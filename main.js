@@ -462,7 +462,7 @@ class Renault extends utils.Adapter {
                 const url =
                     "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
                     this.account.accountId +
-                    "/kamereon/kca/car-adapter/v2/cars/" +
+                    "/kamereon/kca/car-adapter/v1/cars/" +
                     deviceId +
                     "/" +
                     path +
