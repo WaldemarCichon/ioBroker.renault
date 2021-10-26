@@ -51,7 +51,7 @@ class Renault extends utils.Adapter {
 
         await this.login();
 
-        if (this.session.id_token) {
+        if (this.session.id_token && this.session_data) {
             await this.getDeviceList();
             await this.updateDevices();
             this.updateInterval = setInterval(async () => {
@@ -59,7 +59,7 @@ class Renault extends utils.Adapter {
             }, this.config.interval * 60 * 1000);
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken();
-            }, 3500 * 1000); //7days
+            }, 3500 * 1000);
         }
     }
     async login() {
@@ -384,6 +384,11 @@ class Renault extends utils.Adapter {
         });
     }
     async refreshToken() {
+        if (!this.session_data) {
+            this.log.error("No session found relogin");
+            await this.login();
+            return;
+        }
         await this.requestClient({
             method: "post",
             url: "https://accounts.eu1.gigya.com/accounts.getJWT",
