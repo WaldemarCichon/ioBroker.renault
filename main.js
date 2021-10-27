@@ -51,7 +51,7 @@ class Renault extends utils.Adapter {
 
         await this.login();
 
-        if (this.session.id_token && this.session_data) {
+        if (this.session.id_token && this.session_data && this.account) {
             await this.getDeviceList();
             await this.updateDevices();
             this.updateInterval = setInterval(async () => {
@@ -144,7 +144,12 @@ class Renault extends utils.Adapter {
                 const filteredAccounts = res.data.currentUser.accounts.filter(function (el) {
                     return el.accountType === "MYRENAULT" && el.accountStatus === "ACTIVE";
                 });
-
+                if (filteredAccounts.length === 0) {
+                    this.log.error("No Account found");
+                    this.log.error("All accounts: " + res.data.currentUser.accounts);
+                    this.log.error("Filtered accounts: " + filteredAccounts);
+                    return;
+                }
                 this.account = filteredAccounts[0];
             })
             .catch((error) => {
