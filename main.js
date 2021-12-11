@@ -142,7 +142,7 @@ class Renault extends utils.Adapter {
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
                 const filteredAccounts = res.data.currentUser.accounts.filter(function (el) {
-                    return el.accountType === "MYRENAULT" && el.accountStatus === "ACTIVE";
+                    return (el.accountType === "MYRENAULT" || el.accountType === "MYDACIA") && el.accountStatus === "ACTIVE";
                 });
                 if (filteredAccounts.length === 0) {
                     this.log.error("No Account found");
@@ -432,6 +432,9 @@ class Renault extends utils.Adapter {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
     toCamelCase(string) {
+        if (!string) {
+            return;
+        }
         const camelC = string.replace(/-([a-z])/g, function (g) {
             return g[1].toUpperCase();
         });
