@@ -27,6 +27,7 @@ class Renault extends utils.Adapter {
         this.deviceArray = [];
         this.json2iob = new Json2iob(this);
         this.ignoreState = [];
+        this.firstUpdate = true;
     }
 
     /**
@@ -327,8 +328,8 @@ class Renault extends utils.Adapter {
             "accept-language": "de-de",
             "x-gigya-id_token": this.session.id_token,
         };
-        this.deviceArray.forEach(async (vin) => {
-            statusArray.forEach(async (element) => {
+        for (const vin of this.deviceArray) {
+            for (const element of statusArray) {
                 if (this.ignoreState.includes(element.path)) {
                     return;
                 }
@@ -366,27 +367,30 @@ class Renault extends utils.Adapter {
 
                                 return;
                             }
-                            if (
-                                error.response.status === 403 ||
-                                error.response.status === 404 ||
-                                error.response.status === 500 ||
-                                error.response.status === 501 ||
-                                error.response.status === 502 ||
-                                error.response.status === 400
-                            ) {
-                                this.ignoreState.push(element.path);
-                                this.log.info("Feature not found. Ignore " + element.path + " for updates.");
-                                this.log.info(error);
-                                error.response && this.log.info(JSON.stringify(error.response.data));
-                                return;
+                            if (this.firstUpdate) {
+                                if (
+                                    error.response.status === 403 ||
+                                    error.response.status === 404 ||
+                                    error.response.status === 500 ||
+                                    error.response.status === 501 ||
+                                    error.response.status === 502 ||
+                                    error.response.status === 400
+                                ) {
+                                    this.ignoreState.push(element.path);
+                                    this.log.info("Feature not found. Ignore " + element.path + " for updates.");
+                                    this.log.info(error);
+                                    error.response && this.log.info(JSON.stringify(error.response.data));
+                                    return;
+                                }
                             }
                         }
                         this.log.error(url);
                         this.log.error(error);
                         error.response && this.log.error(JSON.stringify(error.response.data));
                     });
-            });
-        });
+            }
+        }
+        this.firstUpdate = false;
     }
     async refreshToken() {
         if (!this.session_data) {
