@@ -12,13 +12,12 @@
 
 **Tests:** ![Test and Release](https://github.com/TA2k/ioBroker.renault/workflows/Test%20and%20Release/badge.svg)
 
-## renault adapter for ioBroker
+## renault/dacia adapter for ioBroker
 
-Adapter for Renault and Renault
-
+Adapter for Renault and Dacia
 ## Loginablauf
 
-Die myRenault Mail und Passwort eingeben.
+Die myRenault/myDacia Mail und Passwort eingeben.
 
 ## Steuern
 
