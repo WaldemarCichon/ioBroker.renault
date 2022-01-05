@@ -475,6 +475,10 @@ class Renault extends utils.Adapter {
                 if (path === "hvac-temperature") {
                     return;
                 }
+                if (!this.account) {
+                    this.log.error("No account found");
+                    return;
+                }
                 const command = path.split("/")[1];
                 const data = { data: { type: this.toCamelCase(command), attributes: { action: state.val ? "start" : "cancel" } } };
                 if (command === "hvac-start") {
