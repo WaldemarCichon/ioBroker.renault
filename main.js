@@ -166,7 +166,7 @@ class Renault extends utils.Adapter {
             method: "get",
             url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/vehicles?country=" + this.country + "&oms=false",
             headers: {
-                apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
+                apikey: "VAX7XYKGfa92yMvXculCkEFyfZbuM7Ss",
                 "content-type": "application/json",
                 accept: "*/*",
                 "user-agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
