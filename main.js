@@ -135,7 +135,7 @@ class Renault extends utils.Adapter {
                 "Content-Type": "application/json",
                 Accept: "*/*",
                 "User-Agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
-                apiKey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
+                apiKey: "VAX7XYKGfa92yMvXculCkEFyfZbuM7Ss",
                 "Accept-Language": "de-de",
                 "x-gigya-id_token": this.session.id_token,
             },
@@ -154,6 +154,7 @@ class Renault extends utils.Adapter {
                 this.account = filteredAccounts[0];
             })
             .catch((error) => {
+                this.log.error("Error while getting account");
                 this.log.error(error);
                 if (error.response) {
                     this.log.error(JSON.stringify(error.response.data));
@@ -228,6 +229,7 @@ class Renault extends utils.Adapter {
                 }
             })
             .catch((error) => {
+                this.log.error("Error while getting vehicle list");
                 this.log.error(error);
                 error.response && this.log.error(JSON.stringify(error.response.data));
             });
