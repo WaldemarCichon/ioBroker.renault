@@ -48,6 +48,11 @@ class Renault extends utils.Adapter {
         this.session = {};
         //DE API Key
         this.apiKey = "3_7PLksOyBRkHv126x5WhHb-5pqC1qFR8pQjxSeLB6nhAnPERTUlwnYoznHSxwX668";
+        this.apiKeyUpdate = "VAX7XYKGfa92yMvXculCkEFyfZbuM7Ss";
+        if (this.config.apiKeyUpdate) {
+            this.apiKeyUpdate = this.config.apiKeyUpdate;
+        }
+
         this.subscribeStates("*");
 
         await this.login();
@@ -135,13 +140,14 @@ class Renault extends utils.Adapter {
                 "Content-Type": "application/json",
                 Accept: "*/*",
                 "User-Agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
-                apiKey: "VAX7XYKGfa92yMvXculCkEFyfZbuM7Ss",
+                apiKey: this.apiKeyUpdate,
                 "Accept-Language": "de-de",
                 "x-gigya-id_token": this.session.id_token,
             },
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
+
                 const filteredAccounts = res.data.currentUser.accounts.filter(function (el) {
                     return (el.accountType === "MYRENAULT" || el.accountType === "MYDACIA") && el.accountStatus === "ACTIVE";
                 });
@@ -166,7 +172,7 @@ class Renault extends utils.Adapter {
             method: "get",
             url: "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" + this.account.accountId + "/vehicles?country=" + this.country + "&oms=false",
             headers: {
-                apikey: "VAX7XYKGfa92yMvXculCkEFyfZbuM7Ss",
+                apikey: this.apiKeyUpdate,
                 "content-type": "application/json",
                 accept: "*/*",
                 "user-agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
@@ -323,7 +329,7 @@ class Renault extends utils.Adapter {
         ];
 
         const headers = {
-            apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
+            apikey: this.apiKeyUpdate,
             "content-type": "application/json",
             accept: "*/*",
             "user-agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
@@ -506,7 +512,7 @@ class Renault extends utils.Adapter {
                     method: "post",
                     url: url,
                     headers: {
-                        apikey: "Ae9FDWugRxZQAGm3Sxgk7uJn6Q4CGEA2",
+                        apikey: this.apiKeyUpdate,
                         "content-type": "application/vnd.api+json",
                         accept: "*/*",
                         "user-agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
