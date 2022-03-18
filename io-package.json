@@ -3,6 +3,9 @@
         "name": "renault",
         "version": "0.0.10",
         "news": {
+            "0.0.11": {
+                "en": "add remote object for force refresh"
+            },
             "0.0.10": {
                 "en": "update apikey"
             },

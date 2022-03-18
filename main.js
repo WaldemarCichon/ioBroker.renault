@@ -220,6 +220,7 @@ class Renault extends utils.Adapter {
                         { command: "actions/charging-start", name: "True = Start, False = Stop" },
                         { command: "charge/pause-resume", name: "True = Start, False = Stop" },
                         { command: "charge/start", name: "True = Start, False = Stop" },
+                        { command: "refresh", name: "True = Refresh Data" },
                     ];
                     remoteArray.forEach((remote) => {
                         this.setObjectNotExists(device.vin + ".remote." + remote.command, {
@@ -486,6 +487,11 @@ class Renault extends utils.Adapter {
                 if (path === "hvac-temperature") {
                     return;
                 }
+                if (path === "refresh") {
+                    this.log.info("Force refresh");
+                    this.updateDevices();
+                    return;
+                }
                 if (!this.account) {
                     this.log.error("No account found");
                     return;
@@ -537,7 +543,7 @@ class Renault extends utils.Adapter {
                 clearTimeout(this.refreshTimeout);
                 this.refreshTimeout = setTimeout(async () => {
                     await this.updateDevices();
-                }, 10 * 1000);
+                }, 20 * 1000);
             }
         }
     }
