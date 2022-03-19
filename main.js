@@ -164,7 +164,7 @@ class Renault extends utils.Adapter {
                 this.log.error(error);
                 if (error.response) {
                     this.log.error(JSON.stringify(error.response.data));
-                    if (error.response.data.indexOf("apikey") !== -1) {
+                    if (error.response.data && JSON.stringify(error.response.data).indexOf("apikey") !== -1) {
                         this.log.error("Wrong API Key. Please update API Key in adapter settings");
                     }
                 }
