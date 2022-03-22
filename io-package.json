@@ -94,6 +94,7 @@
         "username": "",
         "country": "de",
         "password": "",
+        "apiKeyUpdate": "",
         "interval": 10
     },
     "objects": [],
