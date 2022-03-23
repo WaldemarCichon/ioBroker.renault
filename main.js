@@ -209,7 +209,7 @@ class Renault extends utils.Adapter {
                     await this.setObjectNotExistsAsync(device.vin + ".general", {
                         type: "channel",
                         common: {
-                            name: "General Information",
+                            name: "WIRD NICHT AKTUALISIERT",
                         },
                         native: {},
                     });
