@@ -393,7 +393,7 @@ class Renault extends utils.Adapter {
                                     }
                                     this.ignoreState[vin].push(element.path);
                                     this.log.info("Feature not found for " + vin + ". Ignore " + element.path + " for updates.");
-                                    this.log.info(error);
+                                    this.log.debug(error);
                                     error.response && this.log.info(JSON.stringify(error.response.data));
                                     return;
                                 }
