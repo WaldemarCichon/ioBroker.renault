@@ -26,7 +26,7 @@ class Renault extends utils.Adapter {
         this.on("unload", this.onUnload.bind(this));
         this.deviceArray = [];
         this.json2iob = new Json2iob(this);
-        this.ignoreState = [];
+        this.ignoreState = {};
         this.firstUpdate = true;
     }
 
@@ -342,7 +342,7 @@ class Renault extends utils.Adapter {
         };
         for (const vin of this.deviceArray) {
             for (const element of statusArray) {
-                if (this.ignoreState.includes(element.path)) {
+                if (this.ignoreState[vin] && this.ignoreState[vin].includes(element.path)) {
                     return;
                 }
                 const url = element.url.replace("$vin", vin);
@@ -388,8 +388,11 @@ class Renault extends utils.Adapter {
                                     error.response.status === 502 ||
                                     error.response.status === 400
                                 ) {
-                                    this.ignoreState.push(element.path);
-                                    this.log.info("Feature not found. Ignore " + element.path + " for updates.");
+                                    if (!this.ignoreState[vin]) {
+                                        this.ignoreState[vin] = [];
+                                    }
+                                    this.ignoreState[vin].push(element.path);
+                                    this.log.info("Feature not found for " + vin + ". Ignore " + element.path + " for updates.");
                                     this.log.info(error);
                                     error.response && this.log.info(JSON.stringify(error.response.data));
                                     return;
