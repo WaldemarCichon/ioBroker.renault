@@ -192,6 +192,8 @@ class Renault extends utils.Adapter {
                     if (device.vehicleDetails.model && device.vehicleDetails.model.label) {
                         name += device.vehicleDetails.model.label;
                     }
+
+                    this.ignoreState[device.vin] = [];
                     await this.setObjectNotExistsAsync(device.vin, {
                         type: "device",
                         common: {
@@ -343,7 +345,7 @@ class Renault extends utils.Adapter {
         for (const vin of this.deviceArray) {
             for (const element of statusArray) {
                 if (this.ignoreState[vin] && this.ignoreState[vin].includes(element.path)) {
-                    return;
+                    continue;
                 }
                 const url = element.url.replace("$vin", vin);
 
@@ -388,13 +390,10 @@ class Renault extends utils.Adapter {
                                     error.response.status === 502 ||
                                     error.response.status === 400
                                 ) {
-                                    if (!this.ignoreState[vin]) {
-                                        this.ignoreState[vin] = [];
-                                    }
                                     this.ignoreState[vin].push(element.path);
                                     this.log.info("Feature not found for " + vin + ". Ignore " + element.path + " for updates.");
                                     this.log.debug(error);
-                                    error.response && this.log.info(JSON.stringify(error.response.data));
+                                    error.response && this.log.debug(JSON.stringify(error.response.data));
                                     return;
                                 }
                             }
