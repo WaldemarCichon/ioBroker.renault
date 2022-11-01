@@ -586,7 +586,7 @@ class Renault extends utils.Adapter {
           data: data,
         })
           .then((res) => {
-            this.log.debug(JSON.stringify(res.data));
+            this.log.info(JSON.stringify(res.data));
             return res.data;
           })
           .catch((error) => {
