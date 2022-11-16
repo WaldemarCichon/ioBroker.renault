@@ -502,6 +502,8 @@ class Renault extends utils.Adapter {
     if (!string) {
       return;
     }
+    string = string.replace("actions/", "");
+    string = string.replace("/", "-");
     const camelC = string.replace(/-([a-z])/g, function (g) {
       return g[1].toUpperCase();
     });
@@ -549,10 +551,12 @@ class Renault extends utils.Adapter {
         }
         const command = path.split("/")[1];
         let action = state.val ? "start" : "cancel";
-        if (path === "charging-start") {
-          action = state.val ? "start" : "stop";
+        let midPart = "kca/car-adapter/v1/cars/";
+        if (path === "charge/pause-resume") {
+          action = state.val ? "resume" : "pause";
+          midPart = "kcm/v1/vehicles/";
         }
-        const data = { data: { type: this.toCamelCase(command), attributes: { action: action } } };
+        const data = { data: { type: this.toCamelCase(path), attributes: { action: action } } };
         if (command === "hvac-start") {
           const temperatureState = await this.getStateAsync(deviceId + ".remote.hvac-temperature");
           if (temperatureState) {
@@ -564,7 +568,8 @@ class Renault extends utils.Adapter {
         const url =
           "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/" +
+          "/kamereon/" +
+          midPart +
           deviceId +
           "/" +
           path +
