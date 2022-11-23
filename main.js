@@ -447,6 +447,10 @@ class Renault extends utils.Adapter {
                 }
               }
             }
+            if (error.response && error.response.status >= 500) {
+              this.log.warn(`Renault Server error: ${error.response.status} `);
+              return;
+            }
             this.log.error(url);
             this.log.error(error);
             error.response && this.log.error(JSON.stringify(error.response.data));
