@@ -48,7 +48,7 @@ class Renault extends utils.Adapter {
     this.session = {};
     //DE API Key
     this.apiKey = "3_7PLksOyBRkHv126x5WhHb-5pqC1qFR8pQjxSeLB6nhAnPERTUlwnYoznHSxwX668";
-    this.apiKeyUpdate = "VAX7XYKGfa92yMvXculCkEFyfZbuM7Ss";
+    this.apiKeyUpdate = "YjkKtHmGfaceeuExUDKGxrLZGGvtVS0J";
     if (this.config.apiKeyUpdate) {
       this.apiKeyUpdate = this.config.apiKeyUpdate;
     }
