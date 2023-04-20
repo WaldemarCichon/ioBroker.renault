@@ -48,24 +48,25 @@ class Renault extends utils.Adapter {
     //DE API Key
     this.apiKey = "3_7PLksOyBRkHv126x5WhHb-5pqC1qFR8pQjxSeLB6nhAnPERTUlwnYoznHSxwX668";
     this.apiKeyUpdate = "YjkKtHmGfaceeuExUDKGxrLZGGvtVS0J";
-    await this.requestClient({
-      method: "get",
-      url: "https://raw.githubusercontent.com/db-EV/ZoePHP/main/src/api-keys.php",
-    })
-
-      .then((res) => {
-        this.log.debug(JSON.stringify(res.data));
-        const data = res.data;
-        //find kamereon_api via regex
-        const regex = /\$kamereon_api\s*=\s*['"]([^'"]+)['"]/;
-        const match = data.match(regex);
-        if (match && match[1]) {
-          this.apiKeyUpdate = match[1];
-        }
+    try {
+      await this.requestClient({
+        method: "get",
+        url: "https://raw.githubusercontent.com/hacf-fr/renault-api/main/src/renault_api/const.py",
       })
-      .catch((error) => {
-        this.log.debug(error);
-      });
+
+        .then((res) => {
+          this.log.debug(JSON.stringify(res.data));
+
+          if (res.data.split('KAMEREON_APIKEY = "')[2] && res.data.split('KAMEREON_APIKEY = "')[2].split('"')[0]) {
+            this.apiKeyUpdate = res.data.split('KAMEREON_APIKEY = "')[2].split('"')[0];
+          }
+        })
+        .catch((error) => {
+          this.log.debug(error);
+        });
+    } catch (error) {
+      this.log.debug(error);
+    }
     if (this.config.apiKeyUpdate) {
       this.apiKeyUpdate = this.config.apiKeyUpdate;
     }

@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "renault",
-    "version": "0.0.16",
+    "version": "0.0.17",
     "news": {
-      "0.0.16": {
+      "0.0.17": {
         "en": "update apikey"
       },
       "0.0.15": {
