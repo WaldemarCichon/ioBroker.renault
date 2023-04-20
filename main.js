@@ -7,10 +7,9 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
-const axios = require("axios");
+const axios = require("axios").default;
 const qs = require("qs");
 const Json2iob = require("./lib/json2iob");
-const descriptions = require("./lib/descriptions");
 
 class Renault extends utils.Adapter {
   /**
@@ -28,6 +27,7 @@ class Renault extends utils.Adapter {
     this.json2iob = new Json2iob(this);
     this.ignoreState = {};
     this.firstUpdate = true;
+    this.requestClient = axios.create();
   }
 
   /**
@@ -40,7 +40,6 @@ class Renault extends utils.Adapter {
       this.log.info("Set interval to minimum 0.5");
       this.config.interval = 0.5;
     }
-    this.requestClient = axios.create();
     this.updateInterval = null;
     this.reLoginTimeout = null;
     this.refreshTokenTimeout = null;
@@ -175,6 +174,7 @@ class Renault extends utils.Adapter {
           this.log.error("Filtered accounts: " + filteredAccounts);
           return;
         }
+
         this.account = filteredAccounts[0];
       })
       .catch((error) => {
@@ -253,7 +253,7 @@ class Renault extends utils.Adapter {
               common: {
                 name: remote.name || "",
                 type: remote.type || "boolean",
-                role: remote.role || "boolean",
+                role: remote.role || "button",
                 write: true,
                 read: true,
               },
@@ -271,6 +271,10 @@ class Renault extends utils.Adapter {
   }
 
   async updateDevices() {
+    if (!this.account.accountId) {
+      this.log.error("No accountId found");
+      return;
+    }
     const curDate = new Date().toISOString().split("T")[0];
 
     const statusArray = [
@@ -441,7 +445,7 @@ class Renault extends utils.Adapter {
               if (error.response.status === 401) {
                 error.response && this.log.debug(JSON.stringify(error.response.data));
                 this.log.info(element.path + " receive 401 error. Refresh Token in 60 seconds");
-                clearTimeout(this.refreshTokenTimeout);
+                this.refreshTokenTimeout && clearTimeout(this.refreshTokenTimeout);
                 this.refreshTokenTimeout = setTimeout(() => {
                   this.refreshToken();
                 }, 1000 * 60);
@@ -457,6 +461,9 @@ class Renault extends utils.Adapter {
                   error.response.status === 502 ||
                   error.response.status === 400
                 ) {
+                  if (!this.ignoreState[vin]) {
+                    this.ignoreState[vin] = [];
+                  }
                   this.ignoreState[vin].push(element.path);
                   this.log.info("Feature not found for " + vin + ". Ignore " + element.path + " for updates.");
                   this.log.debug(error);
@@ -539,9 +546,9 @@ class Renault extends utils.Adapter {
     try {
       this.setState("info.connection", false, true);
       clearTimeout(this.refreshTimeout);
-      clearTimeout(this.reLoginTimeout);
-      clearTimeout(this.refreshTokenTimeout);
-      clearInterval(this.updateInterval);
+      this.reLoginTimeout && clearTimeout(this.reLoginTimeout);
+      this.refreshTokenTimeout && clearTimeout(this.refreshTokenTimeout);
+      this.updateInterval && clearInterval(this.updateInterval);
       clearInterval(this.refreshTokenInterval);
       callback();
     } catch (e) {
