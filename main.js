@@ -49,6 +49,24 @@ class Renault extends utils.Adapter {
     //DE API Key
     this.apiKey = "3_7PLksOyBRkHv126x5WhHb-5pqC1qFR8pQjxSeLB6nhAnPERTUlwnYoznHSxwX668";
     this.apiKeyUpdate = "YjkKtHmGfaceeuExUDKGxrLZGGvtVS0J";
+    await this.requestClient({
+      method: "get",
+      url: "https://raw.githubusercontent.com/db-EV/ZoePHP/main/src/api-keys.php",
+    })
+
+      .then((res) => {
+        this.log.debug(JSON.stringify(res.data));
+        const data = res.data;
+        //find kamereon_api via regex
+        const regex = /\$kamereon_api\s*=\s*['"]([^'"]+)['"]/;
+        const match = data.match(regex);
+        if (match && match[1]) {
+          this.apiKeyUpdate = match[1];
+        }
+      })
+      .catch((error) => {
+        this.log.debug(error);
+      });
     if (this.config.apiKeyUpdate) {
       this.apiKeyUpdate = this.config.apiKeyUpdate;
     }
