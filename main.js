@@ -210,7 +210,7 @@ class Renault extends utils.Adapter {
 
         for (const device of res.data.vehicleLinks) {
           this.deviceArray.push(device.vin);
-          let name = device.vehicleDetails.modelSCR;
+          let name = device.vehicleDetails?.modelSCR || device.brand;
           if (device.vehicleDetails.model && device.vehicleDetails.model.label) {
             name += device.vehicleDetails.model.label;
           }
