@@ -9,7 +9,7 @@
 const utils = require("@iobroker/adapter-core");
 const axios = require("axios").default;
 const qs = require("qs");
-const Json2iob = require("./lib/json2iob");
+const Json2iob = require("json2iob");
 
 class Renault extends utils.Adapter {
   /**
@@ -103,8 +103,6 @@ class Renault extends utils.Adapter {
         httpStatusCodes: "false",
         loginID: this.config.username,
         password: this.config.password,
-        sdk: "js_latest",
-        include: "profile,data",
       }),
     })
       .then((res) => {
