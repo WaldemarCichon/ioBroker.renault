@@ -259,6 +259,7 @@ class Renault extends utils.Adapter {
               native: {},
             });
           });
+          delete device.mileage;
           this.json2iob.parse(device.vin + ".general", device);
         }
       })
