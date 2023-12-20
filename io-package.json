@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "renault",
-    "version": "0.0.21",
+    "version": "0.0.22",
     "news": {
+      "0.0.22": {
+        "en": "add error log"
+      },
       "0.0.21": {
         "en": "fix login"
       },

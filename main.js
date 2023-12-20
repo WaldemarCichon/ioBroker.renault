@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /*
  * Created with @iobroker/create-adapter v2.0.1
@@ -6,10 +6,10 @@
 
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
-const utils = require("@iobroker/adapter-core");
-const axios = require("axios").default;
-const qs = require("qs");
-const Json2iob = require("json2iob");
+const utils = require('@iobroker/adapter-core');
+const axios = require('axios').default;
+const qs = require('qs');
+const Json2iob = require('json2iob');
 
 class Renault extends utils.Adapter {
   /**
@@ -18,11 +18,11 @@ class Renault extends utils.Adapter {
   constructor(options) {
     super({
       ...options,
-      name: "renault",
+      name: 'renault',
     });
-    this.on("ready", this.onReady.bind(this));
-    this.on("stateChange", this.onStateChange.bind(this));
-    this.on("unload", this.onUnload.bind(this));
+    this.on('ready', this.onReady.bind(this));
+    this.on('stateChange', this.onStateChange.bind(this));
+    this.on('unload', this.onUnload.bind(this));
     this.deviceArray = [];
     this.json2iob = new Json2iob(this);
     this.ignoreState = {};
@@ -35,23 +35,23 @@ class Renault extends utils.Adapter {
    */
   async onReady() {
     // Reset the connection indicator during startup
-    this.setState("info.connection", false, true);
+    this.setState('info.connection', false, true);
     if (this.config.interval < 0.5) {
-      this.log.info("Set interval to minimum 0.5");
+      this.log.info('Set interval to minimum 0.5');
       this.config.interval = 0.5;
     }
     this.updateInterval = null;
     this.reLoginTimeout = null;
     this.refreshTokenTimeout = null;
-    this.country = this.config.country || "de";
+    this.country = this.config.country || 'de';
     this.session = {};
     //DE API Key
-    this.apiKey = "3_7PLksOyBRkHv126x5WhHb-5pqC1qFR8pQjxSeLB6nhAnPERTUlwnYoznHSxwX668";
-    this.apiKeyUpdate = "YjkKtHmGfaceeuExUDKGxrLZGGvtVS0J";
+    this.apiKey = '3_7PLksOyBRkHv126x5WhHb-5pqC1qFR8pQjxSeLB6nhAnPERTUlwnYoznHSxwX668';
+    this.apiKeyUpdate = 'YjkKtHmGfaceeuExUDKGxrLZGGvtVS0J';
     try {
       await this.requestClient({
-        method: "get",
-        url: "https://raw.githubusercontent.com/hacf-fr/renault-api/main/src/renault_api/const.py",
+        method: 'get',
+        url: 'https://raw.githubusercontent.com/hacf-fr/renault-api/main/src/renault_api/const.py',
       })
 
         .then((res) => {
@@ -71,7 +71,7 @@ class Renault extends utils.Adapter {
       this.apiKeyUpdate = this.config.apiKeyUpdate;
     }
 
-    this.subscribeStates("*");
+    this.subscribeStates('*');
 
     await this.login();
 
@@ -88,25 +88,29 @@ class Renault extends utils.Adapter {
   }
   async login() {
     this.session_data = await this.requestClient({
-      method: "post",
-      url: "https://accounts.eu1.gigya.com/accounts.login",
+      method: 'post',
+      url: 'https://accounts.eu1.gigya.com/accounts.login',
       headers: {
-        "User-Agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
-        Accept: "*/*",
-        "Accept-Language": "de-de",
-        "Cache-Control": "no-cache",
-        "Content-Type": "application/x-www-form-urlencoded",
+        'User-Agent': 'MYRenault/39 CFNetwork/1312 Darwin/21.0.0',
+        Accept: '*/*',
+        'Accept-Language': 'de-de',
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       data: qs.stringify({
         apikey: this.apiKey,
-        format: "json",
-        httpStatusCodes: "false",
+        format: 'json',
+        httpStatusCodes: 'false',
         loginID: this.config.username,
         password: this.config.password,
       }),
     })
       .then((res) => {
         this.log.debug(JSON.stringify(res.data));
+        if (res.data.errorMessage) {
+          this.log.error(JSON.stringify(res.data));
+          return;
+        }
         return res.data.sessionInfo;
       })
       .catch((error) => {
@@ -116,32 +120,32 @@ class Renault extends utils.Adapter {
         }
       });
     if (!this.session_data) {
-      this.log.error("No session found for this account");
+      this.log.error('No session found for this account');
       return;
     }
     await this.requestClient({
-      method: "post",
-      url: "https://accounts.eu1.gigya.com/accounts.getJWT",
+      method: 'post',
+      url: 'https://accounts.eu1.gigya.com/accounts.getJWT',
       headers: {
-        "User-Agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
-        Accept: "*/*",
-        "Accept-Language": "de-de",
-        "Cache-Control": "no-cache",
-        "Content-Type": "application/x-www-form-urlencoded",
+        'User-Agent': 'MYRenault/39 CFNetwork/1312 Darwin/21.0.0',
+        Accept: '*/*',
+        'Accept-Language': 'de-de',
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       data: qs.stringify({
-        format: "json",
+        format: 'json',
         login_token: this.session_data.cookieValue,
-        sdk: "js_latest",
-        fields: "data.personId,data.gigyaDataCenter",
+        sdk: 'js_latest',
+        fields: 'data.personId,data.gigyaDataCenter',
         apikey: this.apiKey,
-        expiration: "3600",
+        expiration: '3600',
       }),
     })
       .then((res) => {
         this.log.debug(JSON.stringify(res.data));
         this.session = res.data;
-        this.setState("info.connection", true, true);
+        this.setState('info.connection', true, true);
       })
       .catch((error) => {
         this.log.error(error);
@@ -150,59 +154,59 @@ class Renault extends utils.Adapter {
         }
       });
     await this.requestClient({
-      method: "post",
-      url: "https://apis.renault.com/myr/api/v1/connection?&country=DE&product=MYRENAULT&locale=de-DE&displayAccounts=MYRENAULT",
+      method: 'post',
+      url: 'https://apis.renault.com/myr/api/v1/connection?&country=DE&product=MYRENAULT&locale=de-DE&displayAccounts=MYRENAULT',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "*/*",
-        "User-Agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
+        'Content-Type': 'application/json',
+        Accept: '*/*',
+        'User-Agent': 'MYRenault/39 CFNetwork/1312 Darwin/21.0.0',
         apiKey: this.apiKeyUpdate,
-        "Accept-Language": "de-de",
-        "x-gigya-id_token": this.session.id_token,
+        'Accept-Language': 'de-de',
+        'x-gigya-id_token': this.session.id_token,
       },
     })
       .then((res) => {
         this.log.debug(JSON.stringify(res.data));
 
         const filteredAccounts = res.data.currentUser.accounts.filter(function (el) {
-          return (el.accountType === "MYRENAULT" || el.accountType === "MYDACIA") && el.accountStatus === "ACTIVE";
+          return (el.accountType === 'MYRENAULT' || el.accountType === 'MYDACIA') && el.accountStatus === 'ACTIVE';
         });
         if (filteredAccounts.length === 0) {
-          this.log.error("No Account found");
-          this.log.error("All accounts: " + res.data.currentUser.accounts);
-          this.log.error("Filtered accounts: " + filteredAccounts);
+          this.log.error('No Account found');
+          this.log.error('All accounts: ' + res.data.currentUser.accounts);
+          this.log.error('Filtered accounts: ' + filteredAccounts);
           return;
         }
 
         this.account = filteredAccounts[0];
       })
       .catch((error) => {
-        this.log.error("Error while getting account");
+        this.log.error('Error while getting account');
         this.log.error(error);
         if (error.response) {
           this.log.error(JSON.stringify(error.response.data));
-          if (error.response.data && JSON.stringify(error.response.data).indexOf("apikey") !== -1) {
-            this.log.error("Wrong API Key. Please update API Key in adapter settings");
+          if (error.response.data && JSON.stringify(error.response.data).indexOf('apikey') !== -1) {
+            this.log.error('Wrong API Key. Please update API Key in adapter settings');
           }
         }
       });
   }
   async getDeviceList() {
     await this.requestClient({
-      method: "get",
+      method: 'get',
       url:
-        "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+        'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
         this.account.accountId +
-        "/vehicles?country=" +
+        '/vehicles?country=' +
         this.country +
-        "&oms=false",
+        '&oms=false',
       headers: {
         apikey: this.apiKeyUpdate,
-        "content-type": "application/json",
-        accept: "*/*",
-        "user-agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
-        "accept-language": "de-de",
-        "x-gigya-id_token": this.session.id_token,
+        'content-type': 'application/json',
+        accept: '*/*',
+        'user-agent': 'MYRenault/39 CFNetwork/1312 Darwin/21.0.0',
+        'accept-language': 'de-de',
+        'x-gigya-id_token': this.session.id_token,
       },
     })
       .then(async (res) => {
@@ -217,42 +221,42 @@ class Renault extends utils.Adapter {
 
           this.ignoreState[device.vin] = [];
           await this.setObjectNotExistsAsync(device.vin, {
-            type: "device",
+            type: 'device',
             common: {
               name: name,
             },
             native: {},
           });
-          await this.setObjectNotExistsAsync(device.vin + ".remote", {
-            type: "channel",
+          await this.setObjectNotExistsAsync(device.vin + '.remote', {
+            type: 'channel',
             common: {
-              name: "Remote Controls",
+              name: 'Remote Controls',
             },
             native: {},
           });
-          await this.setObjectNotExistsAsync(device.vin + ".general", {
-            type: "channel",
+          await this.setObjectNotExistsAsync(device.vin + '.general', {
+            type: 'channel',
             common: {
-              name: "WIRD NICHT AKTUALISIERT",
+              name: 'WIRD NICHT AKTUALISIERT',
             },
             native: {},
           });
 
           const remoteArray = [
-            { command: "actions/hvac-start", name: "True = Start, False = Stop" },
-            { command: "hvac-temperature", name: "HVAC Temperature", type: "number", role: "value" },
-            { command: "actions/charging-start", name: "True = Start, False = Stop" },
-            { command: "charge/pause-resume", name: "True = Start, False = Stop" },
-            { command: "charge/start", name: "True = Start, False = Stop" },
-            { command: "refresh", name: "True = Refresh Data" },
+            { command: 'actions/hvac-start', name: 'True = Start, False = Stop' },
+            { command: 'hvac-temperature', name: 'HVAC Temperature', type: 'number', role: 'value' },
+            { command: 'actions/charging-start', name: 'True = Start, False = Stop' },
+            { command: 'charge/pause-resume', name: 'True = Start, False = Stop' },
+            { command: 'charge/start', name: 'True = Start, False = Stop' },
+            { command: 'refresh', name: 'True = Refresh Data' },
           ];
           remoteArray.forEach((remote) => {
-            this.setObjectNotExists(device.vin + ".remote." + remote.command, {
-              type: "state",
+            this.setObjectNotExists(device.vin + '.remote.' + remote.command, {
+              type: 'state',
               common: {
-                name: remote.name || "",
-                type: remote.type || "boolean",
-                role: remote.role || "button",
+                name: remote.name || '',
+                type: remote.type || 'boolean',
+                role: remote.role || 'button',
                 write: true,
                 read: true,
               },
@@ -260,11 +264,11 @@ class Renault extends utils.Adapter {
             });
           });
           delete device.mileage;
-          this.json2iob.parse(device.vin + ".general", device);
+          this.json2iob.parse(device.vin + '.general', device);
         }
       })
       .catch((error) => {
-        this.log.error("Error while getting vehicle list");
+        this.log.error('Error while getting vehicle list');
         this.log.error(error);
         error.response && this.log.error(JSON.stringify(error.response.data));
       });
@@ -272,152 +276,152 @@ class Renault extends utils.Adapter {
 
   async updateDevices() {
     if (!this.account.accountId) {
-      this.log.error("No accountId found");
+      this.log.error('No accountId found');
       return;
     }
-    const curDate = new Date().toISOString().split("T")[0];
+    const curDate = new Date().toISOString().split('T')[0];
 
     const statusArray = [
       {
-        path: "battery-status",
+        path: 'battery-status',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v2/cars/$vin/battery-status?country=" +
+          '/kamereon/kca/car-adapter/v2/cars/$vin/battery-status?country=' +
           this.country,
-        desc: "Battery status of the car",
+        desc: 'Battery status of the car',
       },
       {
-        path: "battery-inhibition-status",
+        path: 'battery-inhibition-status',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/battery-inhibition-status?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/battery-inhibition-status?country=' +
           this.country,
-        desc: "Battery inhibition status of the car",
+        desc: 'Battery inhibition status of the car',
       },
       {
-        path: "cockpit",
+        path: 'cockpit',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/cockpit?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/cockpit?country=' +
           this.country,
-        desc: "Status of the car",
+        desc: 'Status of the car',
       },
       {
-        path: "cockpitv2",
+        path: 'cockpitv2',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v2/cars/$vin/cockpit?country=" +
+          '/kamereon/kca/car-adapter/v2/cars/$vin/cockpit?country=' +
           this.country,
-        desc: "Statusv2 of the car",
+        desc: 'Statusv2 of the car',
       },
       {
-        path: "charge-mode",
+        path: 'charge-mode',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/charge-mode?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/charge-mode?country=' +
           this.country,
-        desc: "Charge mode of the car",
+        desc: 'Charge mode of the car',
       },
       {
-        path: "hvac-status",
+        path: 'hvac-status',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/hvac-status?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/hvac-status?country=' +
           this.country,
-        desc: "HVAC status of the car",
+        desc: 'HVAC status of the car',
       },
       {
-        path: "hvac-settings",
+        path: 'hvac-settings',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/hvac-settings?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/hvac-settings?country=' +
           this.country,
-        desc: "HVAC settings of the car",
+        desc: 'HVAC settings of the car',
       },
       {
-        path: "charging-settings",
+        path: 'charging-settings',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/charging-settings?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/charging-settings?country=' +
           this.country,
-        desc: "Charging settings of the car",
+        desc: 'Charging settings of the car',
       },
       {
-        path: "charge-history",
+        path: 'charge-history',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/charge-history?type=day&start=1970-01-01&end=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/charge-history?type=day&start=1970-01-01&end=' +
           curDate +
-          "&country=" +
+          '&country=' +
           this.country,
-        desc: "Charging history of the car",
+        desc: 'Charging history of the car',
       },
       {
-        path: "charges",
+        path: 'charges',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/charges?start=1970-01-01&end=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/charges?start=1970-01-01&end=' +
           curDate +
-          "&country=" +
+          '&country=' +
           this.country,
-        desc: "Charges of the car",
+        desc: 'Charges of the car',
       },
       {
-        path: "lock-status",
+        path: 'lock-status',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/lock-status?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/lock-status?country=' +
           this.country,
-        desc: "Lock status of the car",
+        desc: 'Lock status of the car',
       },
       {
-        path: "res-state",
+        path: 'res-state',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/res-state?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/res-state?country=' +
           this.country,
-        desc: "Res status of the car",
+        desc: 'Res status of the car',
       },
       {
-        path: "location",
+        path: 'location',
         url:
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/kca/car-adapter/v1/cars/$vin/location?country=" +
+          '/kamereon/kca/car-adapter/v1/cars/$vin/location?country=' +
           this.country,
-        desc: "Location of the car",
+        desc: 'Location of the car',
       },
     ];
 
     const headers = {
       apikey: this.apiKeyUpdate,
-      "content-type": "application/json",
-      accept: "*/*",
-      "user-agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
-      "accept-language": "de-de",
-      "x-gigya-id_token": this.session.id_token,
+      'content-type': 'application/json',
+      accept: '*/*',
+      'user-agent': 'MYRenault/39 CFNetwork/1312 Darwin/21.0.0',
+      'accept-language': 'de-de',
+      'x-gigya-id_token': this.session.id_token,
     };
     for (const vin of this.deviceArray) {
       for (const element of statusArray) {
         if (this.ignoreState[vin] && this.ignoreState[vin].includes(element.path)) {
           continue;
         }
-        const url = element.url.replace("$vin", vin);
+        const url = element.url.replace('$vin', vin);
 
         await this.requestClient({
-          method: "get",
+          method: 'get',
           url: url,
           headers: headers,
         })
@@ -434,7 +438,7 @@ class Renault extends utils.Adapter {
             const forceIndex = null;
             const preferedArrayName = null;
 
-            this.json2iob.parse(vin + "." + element.path, data, {
+            this.json2iob.parse(vin + '.' + element.path, data, {
               forceIndex: forceIndex,
               preferedArrayName: preferedArrayName,
               channelName: element.desc,
@@ -444,7 +448,7 @@ class Renault extends utils.Adapter {
             if (error.response) {
               if (error.response.status === 401) {
                 error.response && this.log.debug(JSON.stringify(error.response.data));
-                this.log.info(element.path + " receive 401 error. Refresh Token in 60 seconds");
+                this.log.info(element.path + ' receive 401 error. Refresh Token in 60 seconds');
                 this.refreshTokenTimeout && clearTimeout(this.refreshTokenTimeout);
                 this.refreshTokenTimeout = setTimeout(() => {
                   this.refreshToken();
@@ -465,7 +469,7 @@ class Renault extends utils.Adapter {
                     this.ignoreState[vin] = [];
                   }
                   this.ignoreState[vin].push(element.path);
-                  this.log.info("Feature not found for " + vin + ". Ignore " + element.path + " for updates.");
+                  this.log.info('Feature not found for ' + vin + '. Ignore ' + element.path + ' for updates.');
                   this.log.debug(error);
                   error.response && this.log.debug(JSON.stringify(error.response.data));
                   return;
@@ -486,39 +490,39 @@ class Renault extends utils.Adapter {
   }
   async refreshToken() {
     if (!this.session_data) {
-      this.log.error("No session found relogin");
+      this.log.error('No session found relogin');
       await this.login();
       return;
     }
     await this.requestClient({
-      method: "post",
-      url: "https://accounts.eu1.gigya.com/accounts.getJWT",
+      method: 'post',
+      url: 'https://accounts.eu1.gigya.com/accounts.getJWT',
       headers: {
-        "User-Agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
-        Accept: "*/*",
-        "Accept-Language": "de-de",
-        "Cache-Control": "no-cache",
-        "Content-Type": "application/x-www-form-urlencoded",
+        'User-Agent': 'MYRenault/39 CFNetwork/1312 Darwin/21.0.0',
+        Accept: '*/*',
+        'Accept-Language': 'de-de',
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       data: qs.stringify({
-        format: "json",
+        format: 'json',
         login_token: this.session_data.cookieValue,
-        sdk: "js_latest",
-        fields: "data.personId,data.gigyaDataCenter",
+        sdk: 'js_latest',
+        fields: 'data.personId,data.gigyaDataCenter',
         apikey: this.apiKey,
-        expiration: "3600",
+        expiration: '3600',
       }),
     })
       .then((res) => {
         this.log.debug(JSON.stringify(res.data));
         this.session = res.data;
-        this.setState("info.connection", true, true);
+        this.setState('info.connection', true, true);
       })
       .catch((error) => {
-        this.log.error("refresh token failed");
+        this.log.error('refresh token failed');
         this.log.error(error);
         error.response && this.log.error(JSON.stringify(error.response.data));
-        this.log.error("Start relogin in 1min");
+        this.log.error('Start relogin in 1min');
         this.reLoginTimeout = setTimeout(() => {
           this.login();
         }, 1000 * 60 * 1);
@@ -531,8 +535,8 @@ class Renault extends utils.Adapter {
     if (!string) {
       return;
     }
-    string = string.replace("actions/", "");
-    string = string.replace("/", "-");
+    string = string.replace('actions/', '');
+    string = string.replace('/', '-');
     const camelC = string.replace(/-([a-z])/g, function (g) {
       return g[1].toUpperCase();
     });
@@ -544,7 +548,7 @@ class Renault extends utils.Adapter {
    */
   onUnload(callback) {
     try {
-      this.setState("info.connection", false, true);
+      this.setState('info.connection', false, true);
       clearTimeout(this.refreshTimeout);
       this.reLoginTimeout && clearTimeout(this.reLoginTimeout);
       this.refreshTokenTimeout && clearTimeout(this.refreshTokenTimeout);
@@ -564,30 +568,30 @@ class Renault extends utils.Adapter {
   async onStateChange(id, state) {
     if (state) {
       if (!state.ack) {
-        const deviceId = id.split(".")[2];
-        const path = id.split(".")[4];
-        if (path === "hvac-temperature") {
+        const deviceId = id.split('.')[2];
+        const path = id.split('.')[4];
+        if (path === 'hvac-temperature') {
           return;
         }
-        if (path === "refresh") {
-          this.log.info("Force refresh");
+        if (path === 'refresh') {
+          this.log.info('Force refresh');
           this.updateDevices();
           return;
         }
         if (!this.account) {
-          this.log.error("No account found");
+          this.log.error('No account found');
           return;
         }
-        const command = path.split("/")[1];
-        let action = state.val ? "start" : "cancel";
-        let midPart = "kca/car-adapter/v1/cars/";
-        if (path === "charge/pause-resume") {
-          action = state.val ? "resume" : "pause";
-          midPart = "kcm/v1/vehicles/";
+        const command = path.split('/')[1];
+        let action = state.val ? 'start' : 'cancel';
+        let midPart = 'kca/car-adapter/v1/cars/';
+        if (path === 'charge/pause-resume') {
+          action = state.val ? 'resume' : 'pause';
+          midPart = 'kcm/v1/vehicles/';
         }
         const data = { data: { type: this.toCamelCase(path), attributes: { action: action } } };
-        if (command === "hvac-start") {
-          const temperatureState = await this.getStateAsync(deviceId + ".remote.hvac-temperature");
+        if (command === 'hvac-start') {
+          const temperatureState = await this.getStateAsync(deviceId + '.remote.hvac-temperature');
           if (temperatureState) {
             data.data.attributes.targetTemperature = temperatureState.val ? temperatureState.val : 21;
           } else {
@@ -595,27 +599,27 @@ class Renault extends utils.Adapter {
           }
         }
         const url =
-          "https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/" +
+          'https://api-wired-prod-1-euw1.wrd-aws.com/commerce/v1/accounts/' +
           this.account.accountId +
-          "/kamereon/" +
+          '/kamereon/' +
           midPart +
           deviceId +
-          "/" +
+          '/' +
           path +
-          "?country=" +
+          '?country=' +
           this.country;
         this.log.debug(JSON.stringify(data));
         this.log.debug(url);
         await this.requestClient({
-          method: "post",
+          method: 'post',
           url: url,
           headers: {
             apikey: this.apiKeyUpdate,
-            "content-type": "application/vnd.api+json",
-            accept: "*/*",
-            "user-agent": "MYRenault/39 CFNetwork/1312 Darwin/21.0.0",
-            "accept-language": "de-de",
-            "x-gigya-id_token": this.session.id_token,
+            'content-type': 'application/vnd.api+json',
+            accept: '*/*',
+            'user-agent': 'MYRenault/39 CFNetwork/1312 Darwin/21.0.0',
+            'accept-language': 'de-de',
+            'x-gigya-id_token': this.session.id_token,
           },
           data: data,
         })
